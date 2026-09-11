@@ -225,7 +225,21 @@ interface OutfitRow {
   city: string | null;
   look: string;
   alternatives: string;
+  feedback: string | null;
   created_at: number;
+}
+
+function toOutfit(row: OutfitRow): Outfit {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    occasion: row.occasion,
+    city: row.city,
+    look: parseJson<OutfitLook>(row.look, null as unknown as OutfitLook),
+    alternatives: parseJson<OutfitLook[]>(row.alternatives, []),
+    feedback: (row.feedback === "like" || row.feedback === "dislike" ? row.feedback : null) as Outfit["feedback"],
+    createdAt: row.created_at,
+  };
 }
 
 export function addOutfit(
@@ -249,28 +263,33 @@ export function addOutfit(
 
 export function getOutfit(userId: string, id: string): Outfit | null {
   const row = get<OutfitRow>(`SELECT * FROM outfits WHERE id = ? AND user_id = ?`, id, userId);
-  if (!row) return null;
-  return {
-    id: row.id,
-    userId: row.user_id,
-    occasion: row.occasion,
-    city: row.city,
-    look: parseJson<OutfitLook>(row.look, null as unknown as OutfitLook),
-    alternatives: parseJson<OutfitLook[]>(row.alternatives, []),
-    createdAt: row.created_at,
-  };
+  return row ? toOutfit(row) : null;
 }
 
 export function listOutfits(userId: string): Outfit[] {
-  return all<OutfitRow>(`SELECT * FROM outfits WHERE user_id = ? ORDER BY created_at DESC`, userId).map((row) => ({
-    id: row.id,
-    userId: row.user_id,
-    occasion: row.occasion,
-    city: row.city,
+  return all<OutfitRow>(`SELECT * FROM outfits WHERE user_id = ? ORDER BY created_at DESC`, userId).map(toOutfit);
+}
+
+export function setOutfitFeedback(userId: string, id: string, feedback: "like" | "dislike" | null): Outfit | null {
+  const existing = getOutfit(userId, id);
+  if (!existing) return null;
+  run(`UPDATE outfits SET feedback = ? WHERE id = ? AND user_id = ?`, feedback, id, userId);
+  return getOutfit(userId, id);
+}
+
+/** All feedback events, ordered most recent first. */
+export function listOutfitFeedback(userId: string): { look: OutfitLook; sentiment: "like" | "dislike" }[] {
+  return all<{ look: string; feedback: string }>(
+    `SELECT look, feedback FROM outfits WHERE user_id = ? AND feedback IS NOT NULL ORDER BY created_at DESC`,
+    userId
+  ).map((row) => ({
     look: parseJson<OutfitLook>(row.look, null as unknown as OutfitLook),
-    alternatives: parseJson<OutfitLook[]>(row.alternatives, []),
-    createdAt: row.created_at,
+    sentiment: row.feedback as "like" | "dislike",
   }));
+}
+
+export function clearOutfitFeedback(userId: string): void {
+  run(`UPDATE outfits SET feedback = NULL WHERE user_id = ?`, userId);
 }
 
 export function deleteOutfit(userId: string, id: string): void {

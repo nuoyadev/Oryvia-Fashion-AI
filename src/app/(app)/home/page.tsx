@@ -8,7 +8,7 @@ import { ArrowIcon, BagIcon, ChatIcon, HangerIcon, ImageIcon, SparklesIcon } fro
 import { CATEGORY_LABELS, type ClosetCategory } from "@/client/types";
 
 export default function HomePage() {
-  const { user, closet, outfits, shopping, inspiration } = useApp();
+  const { user, closet, outfits, shopping, inspiration, refreshOutfits } = useApp();
 
   const name = user?.name ?? "toi";
   const topArchetype = user?.styleDna
@@ -60,7 +60,13 @@ export default function HomePage() {
                   Studio <ArrowIcon className="h-4 w-4" />
                 </Link>
               </div>
-              <OutfitCard look={latest.look} compact />
+              <OutfitCard
+                look={latest.look}
+                compact
+                outfitId={latest.id}
+                feedback={latest.feedback}
+                onFeedback={() => refreshOutfits()}
+              />
             </div>
           ) : (
             <Card className="flex h-full flex-col items-start justify-center gap-4 p-7">

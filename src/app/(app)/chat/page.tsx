@@ -7,7 +7,7 @@ import { Button, Card, SectionTitle, Spinner, cx } from "@/components/ui";
 import { SendIcon, TrashIcon, WeatherIcon } from "@/components/icons";
 import { OutfitCard } from "@/components/outfit";
 import { ShoppingListView } from "@/components/shopping";
-import type { ChatMessage, ChatReply } from "@/client/types";
+import type { ChatMessage, ChatReply, Outfit } from "@/client/types";
 
 const SUGGESTIONS = [
   "Une tenue pour un mariage",
@@ -136,6 +136,7 @@ function Avatar() {
 }
 
 function MessageBubble({ message }: { message: ChatMessage }) {
+  const [feedback, setFeedback] = useState<Outfit["feedback"]>(null);
   const content =
     typeof message.content === "string"
       ? ({ text: message.content, kind: "chat" } as ChatReply)
@@ -167,7 +168,13 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         )}
 
         {content.kind === "outfit" && content.outfit && (
-          <OutfitCard look={content.outfit.look} compact />
+          <OutfitCard
+            look={content.outfit.look}
+            compact
+            outfitId={content.outfit.outfitId}
+            feedback={feedback}
+            onFeedback={setFeedback}
+          />
         )}
 
         {content.kind === "shopping" && content.shopping && (

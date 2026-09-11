@@ -10,6 +10,7 @@
 
 import {
   analyzeInspirations,
+  effectiveStyleDna,
   generateOutfit,
   generateShopping,
 } from "./recommend";
@@ -22,7 +23,7 @@ import { nearestColor } from "./palette";
 export interface ChatReply {
   text: string;
   kind: "chat" | "outfit" | "shopping" | "insight";
-  outfit?: { occasion: string; look: OutfitLook; alternatives: OutfitLook[] };
+  outfit?: { occasion: string; look: OutfitLook; alternatives: OutfitLook[]; outfitId: string };
   shopping?: { goal: string; budget: number; style: string; items: ShoppingItem[]; total: number };
   weather?: WeatherInfo;
 }
@@ -34,6 +35,7 @@ interface Ctx {
   dna: NonNullable<ReturnType<typeof repo.findUserById>>["user"]["styleDna"];
   closet: ReturnType<typeof repo.listCloset>;
   inspirations: ReturnType<typeof repo.listInspiration>;
+  feedback: ReturnType<typeof repo.listOutfitFeedback>;
 }
 
 function loadCtx(userId: string): Ctx {
@@ -45,7 +47,12 @@ function loadCtx(userId: string): Ctx {
     dna: row.user.styleDna,
     closet: repo.listCloset(userId),
     inspirations: repo.listInspiration(userId),
+    feedback: repo.listOutfitFeedback(userId),
   };
+}
+
+function effectiveDna(ctx: Ctx) {
+  return ctx.dna ? effectiveStyleDna(ctx.dna, ctx.feedback) : null;
 }
 
 // ── intent detection ────────────────────────────────────────────
@@ -250,17 +257,20 @@ export async function answerChat(userId: string, text: string): Promise<ChatRepl
     const occasion = detectOccasion(text);
     const { look, alternatives } = generateOutfit({
       body: ctx.body,
-      dna: ctx.dna,
+      dna: effectiveDna(ctx),
       closet: ctx.closet,
       occasion,
       weather,
       city,
+      styleHint: text,
     });
+    // Persist so the user can like/dislike it and refine their DNA.
+    const saved = repo.addOutfit(ctx.userId, { occasion, city, look, alternatives });
     const cloud = await callProvider(intent, text, ctx, { weather });
     return {
       kind: "outfit",
       text: cloud ?? localText(intent, ctx, { weather }),
-      outfit: { occasion, look, alternatives },
+      outfit: { occasion, look, alternatives, outfitId: saved.id },
       weather: weather ?? undefined,
     };
   }
@@ -268,7 +278,7 @@ export async function answerChat(userId: string, text: string): Promise<ChatRepl
   if (intent === "shopping") {
     const budget = detectBudget(text) ?? ctx.dna?.budget ?? 300;
     const { items, total } = generateShopping({
-      dna: ctx.dna,
+      dna: effectiveDna(ctx),
       body: ctx.body,
       closet: ctx.closet,
       budget,

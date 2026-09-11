@@ -16,6 +16,7 @@ Oryvia est une **web app** (installable sur iOS / Android / PC en PWA), conçue 
 | 3 | **Style DNA** | Profil généré : répartition d'archétypes (Minimal Luxury, Streetwear, Old Money, Parisien…), palette, marques, budget. |
 | 4 | **Digital Closet** | Ajout de vêtements par **photo (caméra)** → détection automatique de la **couleur**, catégories, inventaire, statistiques et **combinaisons possibles**. |
 | 5 | **AI Outfit Generator** | Génère une tenue complète (occasion + ville + **météo**) à partir de ton corps, ton Style DNA et ton dressing, avec explication, conseils et **variantes**. |
+| 5b | **Feedback j'aime / j'aime pas** | Chaque tenue générée est notée ❤️/👎 : Oryvia **ré-entraîne ton Style DNA** (archétypes + couleurs) en continu, et tu peux réinitialiser. |
 | 6 | **Shopping AI Assistant** | « Améliore mon style old money avec 300 € » → analyse des manques de ta garde-robe, sélection de pièces dans le budget, avec raisons et liens. |
 | 7 | **AI Stylist (chat)** | Conversation en français qui comprend les intentions (tenue, shopping, conseil, inspiration) et renvoie des actions structurées. |
 | 8 | **Virtual Try-On (préparé)** | Architecture de stockage chiffré + PWA caméra prête pour l'AR (phase 3). |

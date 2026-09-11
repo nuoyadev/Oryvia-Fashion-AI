@@ -65,6 +65,7 @@ function migrate(db: DatabaseSync) {
       city TEXT,
       look TEXT NOT NULL,
       alternatives TEXT NOT NULL DEFAULT '[]',
+      feedback TEXT,
       created_at INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_outfits_user ON outfits(user_id);
@@ -102,6 +103,12 @@ function migrate(db: DatabaseSync) {
     );
     CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_messages(user_id);
   `);
+
+  // Lightweight migration for pre-existing databases.
+  const outfitCols = db.prepare("PRAGMA table_info(outfits)").all() as { name: string }[];
+  if (!outfitCols.some((c) => c.name === "feedback")) {
+    db.exec("ALTER TABLE outfits ADD COLUMN feedback TEXT");
+  }
 }
 
 export function db(): DatabaseSync {

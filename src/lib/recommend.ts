@@ -13,6 +13,7 @@ import {
   catalog,
   colorSeasons,
   occasions,
+  seasonMap,
   type Archetype,
   type PieceDef,
   type SeasonPalette,
@@ -22,6 +23,7 @@ import { hexToRgb, nearestColor, isDark } from "./palette";
 import type {
   BodyProfile,
   ClosetItem,
+  FeedbackEntry,
   InspirationItem,
   OutfitLook,
   OutfitPiece,
@@ -223,6 +225,8 @@ export interface OutfitInput {
   occasion: string;
   weather: WeatherInfo | null;
   city: string | null;
+  /** Free-text style request (e.g. "streetwear oversize") that biases archetypes. */
+  styleHint?: string;
 }
 
 export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternatives: OutfitLook[] } {
@@ -243,7 +247,17 @@ export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternat
     ? bodyShapes.find((b) => b.id === input.body!.bodyShape) ?? null
     : null;
   const season = input.weather ? SEASON_BY_TEMP(input.weather.tempC) : "all";
-  const archetypeIds = input.dna
+  const archetypeIds = input.styleHint
+    ? archetypesFromText(
+        input.styleHint,
+        input.dna
+          ? Object.entries(input.dna.archetypes)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 3)
+              .map(([id]) => id)
+          : ["minimal_luxury", "classic", "parisian"]
+      )
+    : input.dna
     ? Object.entries(input.dna.archetypes)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 3)
@@ -261,8 +275,9 @@ export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternat
     let bestCloset: (typeof candidates)[number] | null = null;
     let bestScore = -Infinity;
     for (const c of candidates) {
+      const archs = archetypeOfPiece(c.subcategory, c.tags, c.brand);
       const s = scorePiece(
-        { archetypes: archetypeOfPiece(c.subcategory, c.tags, c.brand), color: c.color },
+        { archetypes: archs, color: c.color },
         ctx
       );
       if (s > bestScore) { bestScore = s; bestCloset = c; }
@@ -277,6 +292,7 @@ export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternat
         brand: bestCloset.brand,
         color: bestCloset.color,
         reason: shapeNote(shape, category),
+        archetypes: archetypeOfPiece(bestCloset.subcategory, bestCloset.tags, bestCloset.brand),
       };
     }
     // Fall back to the fashion catalog (future: real retail search).
@@ -299,6 +315,7 @@ export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternat
       color: p.color,
       price: p.price,
       reason: shapeNote(shape, category),
+      archetypes: p.archetype,
     };
   };
 
@@ -398,7 +415,7 @@ function buildTips(
 }
 
 /** Derive target archetypes from free text (goal/style), else fallback. */
-function archetypesFromText(text: string, fallback: string[]): string[] {
+export function archetypesFromText(text: string, fallback: string[]): string[] {
   const tokens = text.split(/[\s,;.]+/).map(norm);
   const full = norm(text);
   const scores = archetypes.map((a) => {
@@ -542,6 +559,102 @@ export function analyzeInspirations(
   const summary = `Tes inspirations révèlent ${archetypeIds.length ? archetypeIds.map((id) => archetypeMap.get(id)?.label.toLowerCase()).join(", ") : "un goût éclectique"} avec une dominante ${palette[0] ? nearestColor(palette[0]).name.toLowerCase() : "neutre"}.`;
 
   return { palette, tags, archetypes: archetypeIds, colorGaps, summary };
+}
+
+// ── feedback learning (the "moat") ───────────────────────────────
+//
+// Every like/dislike on a generated look re-weights the Style DNA:
+// archetypes and colours present in liked outfits are boosted, those
+// in disliked outfits are faded. The base DNA (from onboarding) is
+// preserved; the effective DNA is computed deterministically from it
+// plus the user's feedback history.
+
+function unique<T>(arr: T[]): T[] {
+  return [...new Set(arr)];
+}
+
+function lookSignals(look: OutfitLook): { archetypes: string[]; colors: string[] } {
+  const archetypes: string[] = [];
+  const colors: string[] = [];
+  for (const item of look.items ?? []) {
+    if (item.archetypes) archetypes.push(...item.archetypes);
+    if (item.color) colors.push(nearestColor(item.color).hex);
+  }
+  return { archetypes: unique(archetypes), colors: unique(colors) };
+}
+
+export function effectiveStyleDna(base: StyleDna, feedback: FeedbackEntry[]): StyleDna {
+  if (!feedback.length) return base;
+
+  const LIKE_W = 6; // archetype points per like
+  const DISLIKE_W = 3; // archetype points per dislike
+
+  // 1. Archetype weights.
+  const weights = new Map<string, number>(Object.entries(base.archetypes));
+  for (const f of feedback) {
+    const { archetypes } = lookSignals(f.look);
+    const mult = f.sentiment === "like" ? LIKE_W : -DISLIKE_W;
+    for (const a of archetypes) {
+      weights.set(a, Math.max(0, (weights.get(a) ?? 0) + mult));
+    }
+  }
+
+  // 2. Colour scores: base palette keeps its priority order as a score.
+  const colorScores = new Map<string, number>();
+  base.palette.forEach((c, i) => {
+    const hex = nearestColor(c).hex;
+    colorScores.set(hex, Math.max(colorScores.get(hex) ?? 0, base.palette.length - i));
+  });
+  for (const f of feedback) {
+    const { colors } = lookSignals(f.look);
+    const mult = f.sentiment === "like" ? 3 : -1.5;
+    for (const c of colors) {
+      colorScores.set(c, (colorScores.get(c) ?? 0) + mult);
+    }
+  }
+
+  // 3. Normalize archetypes to 100 (drop zeroes, keep at least 3).
+  let archetypes: Record<string, number> = {};
+  const ordered = [...weights.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  if (ordered.length === 0) {
+    archetypes = { ...base.archetypes };
+  } else {
+    const total = ordered.reduce((s, [, v]) => s + v, 0);
+    let acc = 0;
+    ordered.forEach(([id, v], i) => {
+      if (i === ordered.length - 1) {
+        archetypes[id] = Math.max(0, 100 - acc);
+      } else {
+        const pct = Math.round((v / total) * 100);
+        archetypes[id] = pct;
+        acc += pct;
+      }
+    });
+    // Prune 0% entries while keeping the dominant identity.
+    const nonzero = Object.entries(archetypes).filter(([, v]) => v > 0);
+    if (nonzero.length > 0) {
+      archetypes = Object.fromEntries(nonzero);
+    }
+  }
+
+  // 4. Rebuild the palette by score.
+  let palette = [...colorScores.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c).slice(0, 9);
+  while (palette.length < 4) {
+    const fallback = base.palette[palette.length % base.palette.length];
+    const hex = nearestColor(fallback).hex;
+    if (!palette.includes(hex)) palette.push(hex);
+    else break;
+  }
+
+  // 5. Recompute the vibe from the new dominant archetype.
+  const topId = Object.entries(archetypes).sort((a, b) => b[1] - a[1])[0][0];
+  const top = archetypeMap.get(topId);
+  const seasonLabel = seasonMap.get(base.colorSeason ?? "")?.label.toLowerCase();
+  const vibe = top
+    ? `${top.label}${seasonLabel ? ` teinté ${seasonLabel}` : ""} — affiné par tes likes.`
+    : base.vibe;
+
+  return { ...base, archetypes, palette, vibe };
 }
 
 /** Keep only colours that are light enough to hold dark text. */

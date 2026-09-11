@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { fail, getSessionUser, ok } from "@/lib/api";
-import { addOutfit, listOutfits, listCloset, findUserById } from "@/lib/repo";
-import { generateOutfit } from "@/lib/recommend";
+import { addOutfit, listOutfits, listCloset, listOutfitFeedback, findUserById } from "@/lib/repo";
+import { effectiveStyleDna, generateOutfit } from "@/lib/recommend";
 import { getWeather, geocodeCity } from "@/lib/weather";
 
 export async function GET() {
@@ -29,9 +29,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // The effective DNA blends the onboarding base with the user's
+  // like/dislike history — feedback shapes every new outfit.
+  const baseDna = row.user.styleDna;
+  const dna = baseDna ? effectiveStyleDna(baseDna, listOutfitFeedback(session.id)) : null;
+
   const { look, alternatives } = generateOutfit({
     body: row.user.bodyProfile,
-    dna: row.user.styleDna,
+    dna,
     closet: listCloset(session.id),
     occasion,
     weather,

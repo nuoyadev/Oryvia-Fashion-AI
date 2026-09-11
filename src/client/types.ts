@@ -78,6 +78,7 @@ export interface OutfitPiece {
   color?: string | null;
   price?: number | null;
   reason?: string | null;
+  archetypes?: string[];
 }
 
 export interface OutfitLook {
@@ -104,6 +105,7 @@ export interface Outfit {
   city: string | null;
   look: OutfitLook;
   alternatives: OutfitLook[];
+  feedback: "like" | "dislike" | null;
   createdAt: number;
 }
 
@@ -150,7 +152,7 @@ export interface ChatMessage {
 export interface ChatReply {
   text: string;
   kind: "chat" | "outfit" | "shopping" | "insight";
-  outfit?: { occasion: string; look: OutfitLook; alternatives: OutfitLook[] };
+  outfit?: { occasion: string; look: OutfitLook; alternatives: OutfitLook[]; outfitId: string };
   shopping?: { goal: string; budget: number; style: string; items: ShoppingItem[]; total: number };
   weather?: WeatherInfo;
 }

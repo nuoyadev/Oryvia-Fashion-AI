@@ -14,6 +14,7 @@ export default function StudioPage() {
   const [city, setCity] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<(Outfit & { weather?: WeatherInfo }) | null>(null);
+  const [feedback, setFeedback] = useState<Outfit["feedback"]>(null);
   const [tab, setTab] = useState<"look" | "alt">("look");
 
   async function generate() {
@@ -29,6 +30,7 @@ export default function StudioPage() {
         if (wx) res.weather = wx;
       }
       setResult(res);
+      setFeedback(res.feedback ?? null);
       setTab("look");
       await refreshOutfits();
     } catch (e) {
@@ -97,7 +99,16 @@ export default function StudioPage() {
             ))}
           </div>
           {tab === "look" ? (
-            <OutfitCard look={result.look} weatherLine={weatherLine} />
+            <OutfitCard
+              look={result.look}
+              weatherLine={weatherLine}
+              outfitId={result.id}
+              feedback={feedback}
+              onFeedback={(fb) => {
+                setFeedback(fb);
+                refreshOutfits();
+              }}
+            />
           ) : (
             <OutfitCard look={result.alternatives[Number(tab.replace("alt", ""))]} />
           )}

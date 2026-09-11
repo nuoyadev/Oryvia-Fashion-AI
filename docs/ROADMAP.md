@@ -9,6 +9,7 @@
 - ✅ AI Outfit Generator : occasion + ville + météo, variantes, conseils morphologie
 - ✅ Shopping AI Assistant : budget + objectif → sélection avec raisons
 - ✅ AI Stylist chat : intentions (tenue / shopping / conseil / inspiration)
+- ✅ Feedback « j'aime / j'aime pas » sur les tenues → ré-entraînement continu du Style DNA
 - ✅ Style Learning Engine : inspirations → palette + manques détectés
 - ✅ PWA installable (iOS / Android / PC)
 - ✅ Architecture IA modulaire + fournisseurs cloud optionnels

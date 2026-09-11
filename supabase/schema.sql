@@ -46,6 +46,7 @@ create table if not exists public.outfits (
   city         text,
   look         jsonb not null,
   alternatives jsonb not null default '[]',
+  feedback     text,                       -- like | dislike | null
   created_at   timestamptz not null default now()
 );
 create index if not exists idx_outfits_user on public.outfits(user_id);

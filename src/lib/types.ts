@@ -79,6 +79,8 @@ export interface OutfitPiece {
   color?: string | null;
   price?: number | null;
   reason?: string | null;
+  /** Style archetypes this piece represents (used for feedback learning). */
+  archetypes?: string[];
 }
 
 export interface OutfitLook {
@@ -97,7 +99,14 @@ export interface Outfit {
   city: string | null;
   look: OutfitLook;
   alternatives: OutfitLook[];
+  feedback: "like" | "dislike" | null;
   createdAt: number;
+}
+
+/** A single feedback event, used to re-train the Style DNA. */
+export interface FeedbackEntry {
+  look: OutfitLook;
+  sentiment: "like" | "dislike";
 }
 
 export interface InspirationItem {

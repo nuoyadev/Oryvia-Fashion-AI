@@ -1,7 +1,8 @@
 "use client";
 
-import { CATEGORY_EMOJI, type OutfitLook, type OutfitPiece } from "@/client/types";
+import { CATEGORY_EMOJI, type Outfit, type OutfitLook, type OutfitPiece } from "@/client/types";
 import { Card, cx } from "./ui";
+import { FeedbackButtons } from "./feedback";
 
 function PieceRow({ piece, index }: { piece: OutfitPiece; index: number }) {
   const fromCloset = piece.kind === "closet";
@@ -41,11 +42,17 @@ export function OutfitCard({
   look,
   weatherLine,
   compact,
+  outfitId,
+  feedback,
+  onFeedback,
   footer,
 }: {
   look: OutfitLook;
   weatherLine?: string;
   compact?: boolean;
+  outfitId?: string;
+  feedback?: Outfit["feedback"];
+  onFeedback?: (fb: Outfit["feedback"]) => void;
   footer?: React.ReactNode;
 }) {
   return (
@@ -82,6 +89,19 @@ export function OutfitCard({
                 {tip}
               </p>
             ))}
+          </div>
+        )}
+
+        {outfitId && (
+          <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3.5">
+            <span className="text-xs text-muted">
+              {feedback === "like"
+                ? "Tu aimes — je renforce cette direction ✨"
+                : feedback === "dislike"
+                ? "Noté — je m'éloigne de cette direction."
+                : "Ce look te plaît ?"}
+            </span>
+            <FeedbackButtons outfitId={outfitId} feedback={feedback ?? null} onFeedback={onFeedback} />
           </div>
         )}
       </div>
