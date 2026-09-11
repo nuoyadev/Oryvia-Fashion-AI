@@ -27,7 +27,8 @@
 
 ### 3. Couche IA (modulaire)
 - **Vision Analysis Service** (`analyze.ts`) : décode JPEG/PNG en pur JS (`jpeg-js` + décodeur PNG maison) et extrait couleur dominante, palette, luminosité, chaleur.
-- **Style Recommendation Engine** (`recommend.ts`) : détection de saison colorimétrique, calcul des archétypes (matching de mots-clés + marques + phrases), génération de tenues (sélection dressing d'abord, catalogue ensuite, avec score de compatibilité), génération shopping (analyse des manques + budget).
+- **Colour Harmony Engine** (`harmony.ts`) : détecte la carnation (sous-ton, clarté) d'une photo ou d'un flux caméra et score l'accord d'une palette de tenue avec le teint (pur TS, exécuté côté client **et** serveur).
+- **Style Recommendation Engine** (`recommend.ts`) : détection de saison colorimétrique, calcul des archétypes, génération de tenues, génération shopping, **ré-entraînement du Style DNA par feedback** (`effectiveStyleDna`).
 - **Fashion Knowledge Base** (`fashion.ts`) : morphologies, saisons, 12 archétypes, ~50 pièces de catalogue, occasions.
 - **AI Orchestrator** (`ai.ts`) : détection d'intention (tenue/shopping/conseil/inspiration/greeting), extraction d'occasion, de ville et de budget, appel des fournisseurs cloud optionnels, fallback local.
 
@@ -38,7 +39,7 @@
 
 ### 5. Données
 - SQLite (`node:sqlite`), mode WAL.
-- Tables : `users`, `closet_items`, `outfits`, `inspiration_items`, `shopping_lists`, `chat_messages`.
+- Tables : `users`, `closet_items`, `outfits`, `inspiration_items`, `shopping_lists`, `chat_messages`, `style_snapshots`, `tryons`.
 - Production : `supabase/schema.sql` avec Row Level Security par `auth.uid()` et bucket privé `oryvia-vault`.
 
 ## Flux clés

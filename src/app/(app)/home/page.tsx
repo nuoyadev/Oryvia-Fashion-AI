@@ -42,12 +42,29 @@ export default function HomePage() {
       </div>
 
       {/* quick actions */}
-      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <QuickAction href="/studio" emoji="🪄" title="Créer une tenue" sub="Studio IA" gradient />
         <QuickAction href="/closet" emoji="🧺" title="Scanner mon dressing" sub="Ajouter des pièces" />
         <QuickAction href="/inspiration" emoji="📌" title="Ajouter des inspirations" sub="Pinterest & co" />
         <QuickAction href="/shopping" emoji="🛒" title="Liste shopping" sub="Avec mon budget" />
       </div>
+
+      {/* try-on CTA */}
+      <Link
+        href="/tryon"
+        className="mb-8 flex items-center gap-4 rounded-3xl border border-white/10 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-rose/40"
+      >
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-2xl">
+          📷
+        </span>
+        <div className="flex-1">
+          <p className="font-display text-lg text-cream">Essaye une tenue en temps réel</p>
+          <p className="text-sm text-muted">
+            Ta caméra analyse ton teint et te dit si ces couleurs te mettent en valeur.
+          </p>
+        </div>
+        <ArrowIcon className="h-5 w-5 text-rose" />
+      </Link>
 
       <div className="grid gap-6 lg:grid-cols-5">
         {/* latest outfit */}

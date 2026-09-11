@@ -168,6 +168,39 @@ export interface StyleDnaInput {
   budgetTier: BudgetTier;
 }
 
+export interface StyleSnapshot {
+  id: string;
+  userId: string;
+  trigger: "onboarding" | "like" | "dislike" | "reset";
+  dna: StyleDna;
+  createdAt: number;
+}
+
+export interface TryOn {
+  id: string;
+  userId: string;
+  outfitId: string | null;
+  lookName: string;
+  image: string;
+  verdict: { score: number; verdict: string; palette: string[] };
+  createdAt: number;
+}
+
+export interface HarmonyColor {
+  hex: string;
+  name: string;
+  ok: boolean;
+  note: string;
+}
+
+export interface HarmonyResult {
+  score: number;
+  verdict: string;
+  undertoneLabel: string;
+  perColor: HarmonyColor[];
+  notes: string[];
+}
+
 export const BODY_SHAPES: { id: BodyShape; label: string; emoji: string; hint: string }[] = [
   { id: "hourglass", label: "Sablier", emoji: "⏳", hint: "Taille marquée, épaules ≈ hanches" },
   { id: "rectangle", label: "Rectangle", emoji: "▭", hint: "Lignes alignées, peu de courbes" },

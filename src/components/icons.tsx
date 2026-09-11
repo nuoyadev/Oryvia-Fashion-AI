@@ -36,6 +36,8 @@ const P = {
   weather: "M12 3a6 6 0 0 0-5.5 8.6A4 4 0 0 0 9 19h7a5 5 0 0 0 .6-10A6 6 0 0 0 12 3Z",
   logout: "M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4m-6-5 4-4-4-4m4 4H3",
   shield: "M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6l8-3Z",
+  trend: "M3 20h18M5 16l4-5 3 3 5-8",
+  mirror: "M12 3a9 9 0 1 0 9 9 3 3 0 0 1-3-3 3 3 0 0 0-6 0 3 3 0 0 1-3 3 9 9 0 0 0 3-9Z",
 };
 
 export function HomeIcon(props: { className?: string }) {
@@ -94,6 +96,12 @@ export function LogoutIcon(props: { className?: string }) {
 }
 export function ShieldIcon(props: { className?: string }) {
   return <Icon path={P.shield} {...props} />;
+}
+export function TrendIcon(props: { className?: string }) {
+  return <Icon path={P.trend} {...props} />;
+}
+export function MirrorIcon(props: { className?: string }) {
+  return <Icon path={P.mirror} {...props} />;
 }
 
 export function Logo({ className }: { className?: string }) {

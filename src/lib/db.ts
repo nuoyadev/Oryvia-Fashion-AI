@@ -102,6 +102,26 @@ function migrate(db: DatabaseSync) {
       created_at INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_messages(user_id);
+
+    CREATE TABLE IF NOT EXISTS style_snapshots (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      trigger TEXT NOT NULL,
+      dna TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_snap_user ON style_snapshots(user_id);
+
+    CREATE TABLE IF NOT EXISTS tryons (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      outfit_id TEXT,
+      look_name TEXT NOT NULL,
+      image TEXT NOT NULL,
+      verdict TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_tryons_user ON tryons(user_id);
   `);
 
   // Lightweight migration for pre-existing databases.

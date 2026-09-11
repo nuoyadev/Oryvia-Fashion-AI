@@ -84,6 +84,26 @@ create table if not exists public.chat_messages (
 );
 create index if not exists idx_chat_user on public.chat_messages(user_id);
 
+create table if not exists public.style_snapshots (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references public.users(id) on delete cascade,
+  trigger    text not null,               -- onboarding | like | dislike | reset
+  dna        jsonb not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_snap_user on public.style_snapshots(user_id);
+
+create table if not exists public.tryons (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references public.users(id) on delete cascade,
+  outfit_id  uuid,
+  look_name  text not null,
+  image      text not null,               -- encrypted blob path
+  verdict    jsonb not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_tryons_user on public.tryons(user_id);
+
 -- ── Row Level Security ──────────────────────────────────────────
 
 alter table public.users             enable row level security;
@@ -92,6 +112,8 @@ alter table public.outfits           enable row level security;
 alter table public.inspiration_items enable row level security;
 alter table public.shopping_lists    enable row level security;
 alter table public.chat_messages     enable row level security;
+alter table public.style_snapshots   enable row level security;
+alter table public.tryons            enable row level security;
 
 create policy "own users"        on public.users             for all using (id = auth.uid());
 create policy "own closet"       on public.closet_items      for all using (user_id = auth.uid());
@@ -99,6 +121,8 @@ create policy "own outfits"      on public.outfits           for all using (user
 create policy "own inspiration"  on public.inspiration_items for all using (user_id = auth.uid());
 create policy "own shopping"     on public.shopping_lists    for all using (user_id = auth.uid());
 create policy "own chat"         on public.chat_messages     for all using (user_id = auth.uid());
+create policy "own snapshots"    on public.style_snapshots   for all using (user_id = auth.uid());
+create policy "own tryons"       on public.tryons            for all using (user_id = auth.uid());
 
 -- ── Storage (private, encrypted blobs) ──────────────────────────
 

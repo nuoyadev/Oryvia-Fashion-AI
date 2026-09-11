@@ -7,6 +7,7 @@ import { useApp } from "@/client/state";
 import { cx, Spinner } from "@/components/ui";
 import {
   BagIcon,
+  CameraIcon,
   ChatIcon,
   HangerIcon,
   HomeIcon,
@@ -14,6 +15,7 @@ import {
   Logo,
   PaletteIcon,
   SparklesIcon,
+  TrendIcon,
   UserIcon,
 } from "@/components/icons";
 
@@ -22,9 +24,11 @@ const NAV = [
   { href: "/style", label: "Style DNA", icon: PaletteIcon },
   { href: "/closet", label: "Dressing", icon: HangerIcon },
   { href: "/studio", label: "Studio", icon: SparklesIcon },
+  { href: "/tryon", label: "Essai caméra", icon: CameraIcon },
   { href: "/chat", label: "Styliste IA", icon: ChatIcon },
   { href: "/inspiration", label: "Inspiration", icon: ImageIcon },
   { href: "/shopping", label: "Shopping", icon: BagIcon },
+  { href: "/evolution", label: "Évolution", icon: TrendIcon },
   { href: "/profile", label: "Profil", icon: UserIcon },
 ];
 

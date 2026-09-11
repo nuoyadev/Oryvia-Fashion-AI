@@ -14,6 +14,8 @@ import type {
   OutfitLook,
   ShoppingList,
   StyleDna,
+  StyleSnapshot,
+  TryOn,
   User,
 } from "./types";
 
@@ -455,4 +457,105 @@ export function listChatMessages(userId: string, limit = 40): ChatMessage[] {
 
 export function clearChat(userId: string): void {
   run(`DELETE FROM chat_messages WHERE user_id = ?`, userId);
+}
+
+// ── style snapshots (evolution timeline) ────────────────────────
+
+export function addStyleSnapshot(userId: string, trigger: StyleSnapshot["trigger"], dna: StyleDna): StyleSnapshot {
+  const id = randomUUID();
+  const createdAt = Date.now();
+  run(
+    `INSERT INTO style_snapshots (id, user_id, trigger, dna, created_at) VALUES (?, ?, ?, ?, ?)`,
+    id,
+    userId,
+    trigger,
+    toJson(dna),
+    createdAt
+  );
+  return { id, userId, trigger, dna, createdAt };
+}
+
+export function listStyleSnapshots(userId: string): StyleSnapshot[] {
+  return all<{ id: string; user_id: string; trigger: string; dna: string; created_at: number }>(
+    `SELECT * FROM style_snapshots WHERE user_id = ? ORDER BY created_at ASC`,
+    userId
+  ).map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    trigger: row.trigger as StyleSnapshot["trigger"],
+    dna: parseJson<StyleDna>(row.dna, null as unknown as StyleDna),
+    createdAt: row.created_at,
+  }));
+}
+
+/** Ensure the user has at least one snapshot (backfill from onboarding DNA). */
+export function ensureBaseSnapshot(userId: string, dna: StyleDna): void {
+  const count = get<{ n: number }>(`SELECT COUNT(*) AS n FROM style_snapshots WHERE user_id = ?`, userId)?.n ?? 0;
+  if (count === 0) addStyleSnapshot(userId, "onboarding", dna);
+}
+
+export function listLikedOutfits(userId: string): Outfit[] {
+  return listOutfits(userId).filter((o) => o.feedback === "like");
+}
+
+// ── virtual try-ons ─────────────────────────────────────────────
+
+export function addTryOn(
+  userId: string,
+  input: { outfitId: string | null; lookName: string; image: string; verdict: TryOn["verdict"] }
+): TryOn {
+  const id = randomUUID();
+  const createdAt = Date.now();
+  run(
+    `INSERT INTO tryons (id, user_id, outfit_id, look_name, image, verdict, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    id,
+    userId,
+    input.outfitId,
+    input.lookName,
+    input.image,
+    toJson(input.verdict),
+    createdAt
+  );
+  return getTryOn(userId, id)!;
+}
+
+export function getTryOn(userId: string, id: string): TryOn | null {
+  const row = get<{ id: string; user_id: string; outfit_id: string | null; look_name: string; image: string; verdict: string; created_at: number }>(
+    `SELECT * FROM tryons WHERE id = ? AND user_id = ?`,
+    id,
+    userId
+  );
+  if (!row) return null;
+  return {
+    id: row.id,
+    userId: row.user_id,
+    outfitId: row.outfit_id,
+    lookName: row.look_name,
+    image: row.image,
+    verdict: parseJson<TryOn["verdict"]>(row.verdict, { score: 0, verdict: "", palette: [] }),
+    createdAt: row.created_at,
+  };
+}
+
+export function listTryOns(userId: string): TryOn[] {
+  return all<{ id: string; user_id: string; outfit_id: string | null; look_name: string; image: string; verdict: string; created_at: number }>(
+    `SELECT * FROM tryons WHERE user_id = ? ORDER BY created_at DESC`,
+    userId
+  ).map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    outfitId: row.outfit_id,
+    lookName: row.look_name,
+    image: row.image,
+    verdict: parseJson<TryOn["verdict"]>(row.verdict, { score: 0, verdict: "", palette: [] }),
+    createdAt: row.created_at,
+  }));
+}
+
+export function deleteTryOn(userId: string, id: string): { image: string } | null {
+  const row = get<{ image: string }>(`SELECT image FROM tryons WHERE id = ? AND user_id = ?`, id, userId);
+  if (!row) return null;
+  run(`DELETE FROM tryons WHERE id = ? AND user_id = ?`, id, userId);
+  return { image: row.image };
 }

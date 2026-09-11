@@ -14,9 +14,10 @@ export async function POST() {
     .prepare(
       `SELECT image AS rel FROM closet_items WHERE user_id = ? AND image IS NOT NULL
        UNION SELECT image FROM inspiration_items WHERE user_id = ? AND image IS NOT NULL
+       UNION SELECT image FROM tryons WHERE user_id = ? AND image IS NOT NULL
        UNION SELECT avatar FROM users WHERE id = ? AND avatar IS NOT NULL`
     )
-    .all(session.id, session.id, session.id) as { rel: string }[];
+    .all(session.id, session.id, session.id, session.id) as { rel: string }[];
 
   for (const { rel } of rels) {
     try {

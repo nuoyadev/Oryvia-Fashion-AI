@@ -1,6 +1,13 @@
 import { NextRequest } from "next/server";
 import { fail, getSessionUser, ok } from "@/lib/api";
-import { deleteOutfit, setOutfitFeedback } from "@/lib/repo";
+import {
+  addStyleSnapshot,
+  deleteOutfit,
+  findUserById,
+  listOutfitFeedback,
+  setOutfitFeedback,
+} from "@/lib/repo";
+import { effectiveStyleDna } from "@/lib/recommend";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getSessionUser();
@@ -12,6 +19,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
   const outfit = setOutfitFeedback(session.id, params.id, (feedback as "like" | "dislike" | null) ?? null);
   if (!outfit) return fail("Tenue introuvable.", 404);
+
+  // Record how the Style DNA just evolved.
+  const row = findUserById(session.id);
+  if (row?.user.styleDna) {
+    const effective = effectiveStyleDna(row.user.styleDna, listOutfitFeedback(session.id));
+    const trigger: "like" | "dislike" | "reset" =
+      feedback === "like" ? "like" : feedback === "dislike" ? "dislike" : "reset";
+    addStyleSnapshot(session.id, trigger, effective);
+  }
+
   return ok(outfit);
 }
 

@@ -10,6 +10,8 @@
 - ✅ Shopping AI Assistant : budget + objectif → sélection avec raisons
 - ✅ AI Stylist chat : intentions (tenue / shopping / conseil / inspiration)
 - ✅ Feedback « j'aime / j'aime pas » sur les tenues → ré-entraînement continu du Style DNA
+- ✅ Historique visuel « Mon évolution de style » (snapshots, courbe, looks approuvés)
+- ✅ Essai caméra temps réel : analyse du teint + verdict colorimétrique + overlay des pièces
 - ✅ Style Learning Engine : inspirations → palette + manques détectés
 - ✅ PWA installable (iOS / Android / PC)
 - ✅ Architecture IA modulaire + fournisseurs cloud optionnels

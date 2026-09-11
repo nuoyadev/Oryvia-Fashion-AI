@@ -109,6 +109,26 @@ export interface FeedbackEntry {
   sentiment: "like" | "dislike";
 }
 
+/** A dated snapshot of the (effective) Style DNA — the style evolution timeline. */
+export interface StyleSnapshot {
+  id: string;
+  userId: string;
+  trigger: "onboarding" | "like" | "dislike" | "reset";
+  dna: StyleDna;
+  createdAt: number;
+}
+
+/** A saved virtual try-on (selfie + outfit + colour verdict). */
+export interface TryOn {
+  id: string;
+  userId: string;
+  outfitId: string | null;
+  lookName: string;
+  image: string;
+  verdict: { score: number; verdict: string; palette: string[] };
+  createdAt: number;
+}
+
 export interface InspirationItem {
   id: string;
   userId: string;

@@ -18,9 +18,10 @@ export async function GET(_req: NextRequest, { params }: { params: { file: strin
     .prepare(
       `SELECT 1 AS x FROM closet_items WHERE image = ? AND user_id = ?
        UNION SELECT 1 FROM inspiration_items WHERE image = ? AND user_id = ?
+       UNION SELECT 1 FROM tryons WHERE image = ? AND user_id = ?
        UNION SELECT 1 FROM users WHERE avatar = ? AND id = ? LIMIT 1`
     )
-    .get(rel, session.id, rel, session.id, rel, session.id);
+    .get(rel, session.id, rel, session.id, rel, session.id, rel, session.id);
   if (!owned) return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 403 });
 
   try {

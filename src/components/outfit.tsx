@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CATEGORY_EMOJI, type Outfit, type OutfitLook, type OutfitPiece } from "@/client/types";
 import { Card, cx } from "./ui";
 import { FeedbackButtons } from "./feedback";
@@ -93,7 +94,7 @@ export function OutfitCard({
         )}
 
         {outfitId && (
-          <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3.5">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3.5">
             <span className="text-xs text-muted">
               {feedback === "like"
                 ? "Tu aimes — je renforce cette direction ✨"
@@ -101,7 +102,15 @@ export function OutfitCard({
                 ? "Noté — je m'éloigne de cette direction."
                 : "Ce look te plaît ?"}
             </span>
-            <FeedbackButtons outfitId={outfitId} feedback={feedback ?? null} onFeedback={onFeedback} />
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/tryon?outfit=${outfitId}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-semibold text-cream transition-colors hover:border-rose/50 hover:text-rose"
+              >
+                📷 Essayer sur moi
+              </Link>
+              <FeedbackButtons outfitId={outfitId} feedback={feedback ?? null} onFeedback={onFeedback} />
+            </div>
           </div>
         )}
       </div>
