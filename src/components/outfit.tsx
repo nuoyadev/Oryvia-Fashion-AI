@@ -104,6 +104,12 @@ export function OutfitCard({
             </span>
             <div className="flex items-center gap-2">
               <Link
+                href={`/dressing?outfit=${outfitId}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-semibold text-cream transition-colors hover:border-rose/50 hover:text-rose"
+              >
+                🧍 Voir en 3D
+              </Link>
+              <Link
                 href={`/tryon?outfit=${outfitId}`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-semibold text-cream transition-colors hover:border-rose/50 hover:text-rose"
               >

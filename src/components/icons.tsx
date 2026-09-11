@@ -38,6 +38,7 @@ const P = {
   shield: "M12 3l8 3v6c0 4.5-3.2 7.7-8 9-4.8-1.3-8-4.5-8-9V6l8-3Z",
   trend: "M3 20h18M5 16l4-5 3 3 5-8",
   mirror: "M12 3a9 9 0 1 0 9 9 3 3 0 0 1-3-3 3 3 0 0 0-6 0 3 3 0 0 1-3 3 9 9 0 0 0 3-9Z",
+  cube: "M12 3 4 7.5v9L12 21l8-4.5v-9L12 3ZM4 7.5 12 12m0 0 8-4.5M12 12v9",
 };
 
 export function HomeIcon(props: { className?: string }) {
@@ -102,6 +103,9 @@ export function TrendIcon(props: { className?: string }) {
 }
 export function MirrorIcon(props: { className?: string }) {
   return <Icon path={P.mirror} {...props} />;
+}
+export function CubeIcon(props: { className?: string }) {
+  return <Icon path={P.cube} {...props} />;
 }
 
 export function Logo({ className }: { className?: string }) {

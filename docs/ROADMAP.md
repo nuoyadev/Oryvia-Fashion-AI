@@ -12,6 +12,7 @@
 - ✅ Feedback « j'aime / j'aime pas » sur les tenues → ré-entraînement continu du Style DNA
 - ✅ Historique visuel « Mon évolution de style » (snapshots, courbe, looks approuvés)
 - ✅ Essai caméra temps réel : analyse du teint + verdict colorimétrique + overlay des pièces
+- ✅ Dressing 3D : avatar paramétrique + vêtements 3D (couleur détectée) + habillage interactif
 - ✅ Style Learning Engine : inspirations → palette + manques détectés
 - ✅ PWA installable (iOS / Android / PC)
 - ✅ Architecture IA modulaire + fournisseurs cloud optionnels
@@ -31,6 +32,7 @@
 ## Phase 3 — Immersion & partenariats
 
 - **Virtual Try-On / AR** : essayage par caméra, changement de couleur, avant/après
+- **Photogrammétrie** : reconstruction de maillages réels (photo → mesh texturé) pour des vêtements et avatars photo-réalistes — la V1 utilise des modèles paramétriques qui adoptent la couleur détectée
 - Partenariats marques (catalogues + commissions)
 - Partage de looks & communautés
 - Assistant vocal

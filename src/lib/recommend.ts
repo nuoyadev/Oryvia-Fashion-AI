@@ -288,6 +288,7 @@ export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternat
         kind: "closet",
         closetId: bestCloset.id,
         category: bestCloset.category,
+        subcategory: bestCloset.subcategory,
         name: bestCloset.name,
         brand: bestCloset.brand,
         color: bestCloset.color,
@@ -310,6 +311,7 @@ export function generateOutfit(input: OutfitInput): { look: OutfitLook; alternat
     return {
       kind: "shop",
       category: p.category,
+      subcategory: p.subcategory,
       name: p.label,
       brand: p.archetype[0] ? archetypeMap.get(p.archetype[0])?.brands[0] ?? null : null,
       color: p.color,

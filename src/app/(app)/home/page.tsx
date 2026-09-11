@@ -49,22 +49,39 @@ export default function HomePage() {
         <QuickAction href="/shopping" emoji="🛒" title="Liste shopping" sub="Avec mon budget" />
       </div>
 
-      {/* try-on CTA */}
-      <Link
-        href="/tryon"
-        className="mb-8 flex items-center gap-4 rounded-3xl border border-white/10 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-rose/40"
-      >
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-2xl">
-          📷
-        </span>
-        <div className="flex-1">
-          <p className="font-display text-lg text-cream">Essaye une tenue en temps réel</p>
-          <p className="text-sm text-muted">
-            Ta caméra analyse ton teint et te dit si ces couleurs te mettent en valeur.
-          </p>
-        </div>
-        <ArrowIcon className="h-5 w-5 text-rose" />
-      </Link>
+      {/* try-on + 3D CTA */}
+      <div className="mb-8 grid gap-3 md:grid-cols-2">
+        <Link
+          href="/dressing"
+          className="flex items-center gap-4 rounded-3xl border border-white/10 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-rose/40"
+        >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-2xl">
+            🧍
+          </span>
+          <div className="flex-1">
+            <p className="font-display text-lg text-cream">Ton dressing en 3D</p>
+            <p className="text-sm text-muted">
+              Ton avatar 3D habillé avec tes vêtements et leurs vraies couleurs.
+            </p>
+          </div>
+          <ArrowIcon className="h-5 w-5 text-rose" />
+        </Link>
+        <Link
+          href="/tryon"
+          className="flex items-center gap-4 rounded-3xl border border-white/10 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-rose/40"
+        >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-2xl">
+            📷
+          </span>
+          <div className="flex-1">
+            <p className="font-display text-lg text-cream">Essaye une tenue en temps réel</p>
+            <p className="text-sm text-muted">
+              Ta caméra analyse ton teint et te dit si ces couleurs te mettent en valeur.
+            </p>
+          </div>
+          <ArrowIcon className="h-5 w-5 text-rose" />
+        </Link>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-5">
         {/* latest outfit */}

@@ -32,6 +32,11 @@
 - **Fashion Knowledge Base** (`fashion.ts`) : morphologies, saisons, 12 archétypes, ~50 pièces de catalogue, occasions.
 - **AI Orchestrator** (`ai.ts`) : détection d'intention (tenue/shopping/conseil/inspiration/greeting), extraction d'occasion, de ville et de budget, appel des fournisseurs cloud optionnels, fallback local.
 
+### 3b. Couche 3D (avatar paramétrique)
+- `components/three/metrics.ts` : transforme le BodyProfile en proportions 3D (morphologie, mensurations, poids, carnation, cheveux) — pur TS, testable.
+- `components/three/avatar.tsx` : avatar stylisé (tronc par révolution, membres en capsules, visage/cheveux) + vêtements paramétriques (tops, bas, robes, vestes, chaussures, accessoires) habillés de la couleur détectée sur la photo.
+- `components/three/scene.tsx` : scène react-three-fiber (éclairage, ombres de contact, OrbitControls) — chargée dynamiquement (`ssr:false`) pour ne pas alourdir le bundle partagé.
+
 ### 4. Sécurité
 - `crypto.ts` : AES-256-GCM, enveloppe DEK/KEK.
 - `auth.ts` : bcrypt, JWT HS256 (jose), cookie httpOnly.

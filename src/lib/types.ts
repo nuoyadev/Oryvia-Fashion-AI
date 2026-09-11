@@ -74,6 +74,7 @@ export interface OutfitPiece {
   kind: "closet" | "shop";
   closetId?: string | null;
   category: ClosetCategory;
+  subcategory?: string;
   name: string;
   brand?: string | null;
   color?: string | null;

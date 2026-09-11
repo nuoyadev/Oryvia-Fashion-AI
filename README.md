@@ -19,6 +19,7 @@ Oryvia est une **web app** (installable sur iOS / Android / PC en PWA), conçue 
 | 5b | **Feedback j'aime / j'aime pas** | Chaque tenue générée est notée ❤️/👎 : Oryvia **ré-entraîne ton Style DNA** (archétypes + couleurs) en continu, et tu peux réinitialiser. |
 | 5c | **Mon évolution de style** | Historique visuel : **snapshots datés** du Style DNA, courbe d'évolution des archétypes, palette au fil du temps, galerie des looks approuvés. |
 | 5d | **Essai caméra (try-on)** | **Caméra en temps réel** qui analyse ton teint face à une tenue (verdict colorimétrique live), **overlay des pièces** sur ton image, capture sauvegardée **chiffrée**. |
+| 5e | **Dressing 3D** | **Avatar 3D paramétrique** généré à partir de ta morphologie et de tes mensurations ; chaque vêtement devient un **modèle 3D habillé de sa couleur détectée** — habille l'avatar, tourne, zoome, règle la coupe. |
 | 6 | **Shopping AI Assistant** | « Améliore mon style old money avec 300 € » → analyse des manques de ta garde-robe, sélection de pièces dans le budget, avec raisons et liens. |
 | 7 | **AI Stylist (chat)** | Conversation en français qui comprend les intentions (tenue, shopping, conseil, inspiration) et renvoie des actions structurées. |
 | 8 | **Virtual Try-On (préparé)** | Architecture de stockage chiffré + PWA caméra prête pour l'AR (phase 3). |
@@ -111,6 +112,7 @@ src/
 │   │   ├── style/           # Style DNA + conseils morphologie
 │   │   ├── closet/          # Dressing (photos + couleurs auto)
 │   │   ├── studio/          # Générateur de tenues (météo)
+│   │   ├── dressing/        # Dressing 3D (avatar + vêtements paramétriques)
 │   │   ├── tryon/           # Essai caméra (analyse teint + overlays)
 │   │   ├── chat/            # Styliste IA conversationnel
 │   │   ├── inspiration/     # Style Learning Engine
@@ -120,7 +122,7 @@ src/
 │   └── api/                 # Route handlers (auth, closet, outfits…)
 ├── lib/                     # Cœur serveur (crypto, db, ai, fashion, recommend…)
 ├── client/                  # État, types, helpers côté client
-└── components/              # UI partagée (shell, cartes, upload…)
+└── components/              # UI partagée (shell, cartes, upload, three/…)
 
 supabase/schema.sql           # Schéma Postgres + RLS (production)
 scripts/gen-icons.mjs         # Génération des icônes PNG
